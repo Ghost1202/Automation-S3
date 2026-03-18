@@ -56,7 +56,7 @@ resource "aws_security_group" "this" {
     {
       Name = "${var.name}-sg"
     },
-    var.tags,
+    var.tags
   )
 }
 
@@ -75,13 +75,12 @@ resource "aws_instance" "this" {
     {
       Name = "${var.name}-ec2"
     },
-    var.tags,
+    var.tags
   )
 }
 
 resource "aws_eip" "this" {
-  count = var.allocate_eip ? 1 : 0
-
+  count    = var.allocate_eip ? 1 : 0
   instance = aws_instance.this.id
   domain   = "vpc"
 
@@ -89,6 +88,6 @@ resource "aws_eip" "this" {
     {
       Name = "${var.name}-eip"
     },
-    var.tags,
+    var.tags
   )
 }

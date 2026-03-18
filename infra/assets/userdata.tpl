@@ -2,16 +2,17 @@
 set -euo pipefail
 
 APP_USER="ec2-user"
-APP_HOME="/home/${APP_USER}"
-APP_DIR="${APP_HOME}/app"
+APP_HOME="/home/$${APP_USER}"
+APP_DIR="$${APP_HOME}/app"
 
 if command -v dnf >/dev/null 2>&1; then
   dnf -y update
-  dnf -y install docker awscli cronie
+  dnf -y install docker awscli cronie || true
+  dnf -y install docker-compose-plugin || true
 elif command -v yum >/dev/null 2>&1; then
   yum -y update
   amazon-linux-extras install -y docker || true
-  yum -y install docker awscli cronie
+  yum -y install docker awscli cronie || true
 elif command -v apt-get >/dev/null 2>&1; then
   apt-get update -y
   apt-get install -y docker.io docker-compose-plugin awscli cron
@@ -27,10 +28,10 @@ elif systemctl list-unit-files | grep -q '^cron.service'; then
   systemctl restart cron
 fi
 
-if id -u "${APP_USER}" >/dev/null 2>&1; then
-  usermod -aG docker "${APP_USER}" || true
-  mkdir -p "${APP_DIR}"
-  chown -R "${APP_USER}:${APP_USER}" "${APP_HOME}"
+if id -u "$${APP_USER}" >/dev/null 2>&1; then
+  usermod -aG docker "$${APP_USER}" || true
+  mkdir -p "$${APP_DIR}"
+  chown -R "$${APP_USER}:$${APP_USER}" "$${APP_HOME}"
 fi
 
 cat >/usr/local/bin/backup_mongo_to_s3.sh <<'SCRIPT_EOF'
